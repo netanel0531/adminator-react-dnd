@@ -1,5 +1,6 @@
-My clone of Adminator (https://github.com/puikinsh/Adminator-admin-dashboard).
-Starting using React to create objects.
+My clone of [Adminator](https://github.com/puikinsh/Adminator-admin-dashboard)
+## Started using React to create objects
+Basic example at ```src/assets/scripts/charts/chartJS/index.js``` under ```@My React Pie Chart```
 
 
 # Adminator README
