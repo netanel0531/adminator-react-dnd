@@ -65,6 +65,7 @@
     "popper.js": "^1.12.6",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-grid-layout": "^0.16.5",
     "skycons": "^1.0.0"
   },
   "main": "webpack.config.js",

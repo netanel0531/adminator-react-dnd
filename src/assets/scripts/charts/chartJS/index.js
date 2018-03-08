@@ -1,7 +1,10 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import ReactGridLayout from 'react-grid-layout';
+
 import Chart from 'chart.js';
 import { COLORS } from '../../constants/colors';
-import React from 'react'
-import ReactDOM from 'react-dom'
+
 
 export default (function () {
   // ------------------------------------------------------
@@ -86,7 +89,7 @@ export default (function () {
   // ------------------------------------------------------
 
   const areaChartBox = document.getElementById('area-chart');
-  
+
   if (areaChartBox) {
     const areaCtx = areaChartBox.getContext('2d');
 
@@ -147,12 +150,10 @@ export default (function () {
     });
   }
 
- 
-
 }()
 )
 
-class ReactPie extends React.Component{
+class ReactPie extends React.Component {
 
   componentDidMount() {
 
@@ -211,14 +212,39 @@ class ReactPie extends React.Component{
   render() {
     return (
       <div>
-        <h6 class="c-grey-900">React Pie Chart</h6>
+        <h6 className="c-grey-900">React Pie Chart</h6>
         <canvas id="react_pie"></canvas>
       </div>);
   }
 }
 
+class MyFirstGrid extends React.Component {
+  render() {
+    // layout is an array of objects, see the demo for more complete usage
+    var layout = [
+      {i: 'a', x: 0, y: 0, w: 1, h: 2, static: true},
+      {i: 'b', x: 1, y: 0, w: 3, h: 2, minW: 2, maxW: 4},
+      {i: 'c', x: 4, y: 0, w: 1, h: 2},
+      {i: 'd', x:6, y:0, w:5, h:5}
+    ];
+    return (
+      <ReactGridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
+        <div key="a">a</div>
+        <div key="b">b</div>
+        <div key="c">c</div>
+        <div key="d">
+          <ReactPie/>
+        </div>
+      </ReactGridLayout>
+    )
+  }
+} ;
+
 export class App extends React.Component{
   render() {
-    return (<ReactPie />);
+    return (
+    <div>
+      <MyFirstGrid />
+    </div>);
   }
 }
