@@ -15,3 +15,13 @@ import './email';
 import './fullcalendar';
 import './googleMaps';
 import './utils';
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {App} from './charts/chartJS/index'
+
+ReactDOM.render(
+    <App/>,
+    document.getElementById('root')
+);
+

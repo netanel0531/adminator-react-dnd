@@ -1,5 +1,7 @@
 import Chart from 'chart.js';
 import { COLORS } from '../../constants/colors';
+import React from 'react'
+import ReactDOM from 'react-dom'
 
 export default (function () {
   // ------------------------------------------------------
@@ -84,7 +86,7 @@ export default (function () {
   // ------------------------------------------------------
 
   const areaChartBox = document.getElementById('area-chart');
-
+  
   if (areaChartBox) {
     const areaCtx = areaChartBox.getContext('2d');
 
@@ -144,4 +146,79 @@ export default (function () {
       },
     });
   }
-}())
+
+ 
+
+}()
+)
+
+class ReactPie extends React.Component{
+
+  componentDidMount() {
+
+ // ------------------------------------------------------
+  // @My React Pie Chart
+  // ------------------------------------------------------
+  var randomScalingFactor = function() {
+    return Math.round(Math.random() * 100);
+  };
+
+  let myReactPieContainer = document.getElementById('react_pie');
+
+  if (myReactPieContainer) {
+    let pieCtx = myReactPieContainer.getContext('2d');
+
+    new Chart(pieCtx, {
+      type: 'pie',
+      data: {
+				datasets: [{
+					data: [
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+					],
+					backgroundColor: [
+						'rgb(255, 99, 132)',
+						'rgb(255, 159, 64)',
+						'rgb(255, 205, 86)',
+						'rgb(75, 192, 192)',
+            'rgb(54, 162, 235)',
+					],
+					label: 'Dataset 1'
+				}],
+				labels: [
+					'Red',
+					'Orange',
+					'Yellow',
+					'Green',
+					'Blue'
+				]
+			},
+			options: {
+				responsive: true
+			}
+
+    });
+
+
+  } else {
+    console.log('No React pie container');
+  }
+  }
+  
+  render() {
+    return (
+      <div>
+        <h6 class="c-grey-900">React Pie Chart</h6>
+        <canvas id="react_pie"></canvas>
+      </div>);
+  }
+}
+
+export class App extends React.Component{
+  render() {
+    return (<ReactPie />);
+  }
+}
