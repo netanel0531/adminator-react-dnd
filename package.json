@@ -46,12 +46,14 @@
     "webpack-dev-server": "^2.9.3"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "babel-polyfill": "^6.26.0",
     "bootstrap": "^4.0.0",
     "bootstrap-datepicker": "^1.7.1",
     "chart.js": "^2.7.1",
     "datatables": "^1.10.13",
     "easy-pie-chart": "^2.1.7",
+    "elasticsearch": "^14.1.0",
     "file-loader": "^1.1.5",
     "fullcalendar": "^3.6.2",
     "jquery": "^3.2.1",
@@ -61,6 +63,7 @@
     "lodash": "^4.17.4",
     "masonry-layout": "^4.2.0",
     "moment": "^2.19.1",
+    "npm": "^5.7.1",
     "perfect-scrollbar": "^1.1.0",
     "popper.js": "^1.12.6",
     "react": "^16.2.0",

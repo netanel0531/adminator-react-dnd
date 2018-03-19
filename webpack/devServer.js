@@ -25,6 +25,7 @@ const devServer = {
   host               : '0.0.0.0',
   disableHostCheck   : true, // [1]
   overlay            : true,
+  headers: { "Access-Control-Allow-Origin": "*" },
   stats: {
     assets     : true,
     children   : false,

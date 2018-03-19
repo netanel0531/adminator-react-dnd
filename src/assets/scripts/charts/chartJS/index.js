@@ -1,9 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactGridLayout from 'react-grid-layout';
+import ElasticSearch from 'elasticsearch';
+import * as _ from 'lodash';
 
 import Chart from 'chart.js';
 import { COLORS } from '../../constants/colors';
+import Axios from 'axios';
 
 
 export default (function () {
@@ -157,57 +160,170 @@ class ReactPie extends React.Component {
 
   componentDidMount() {
 
- // ------------------------------------------------------
-  // @My React Pie Chart
   // ------------------------------------------------------
-  var randomScalingFactor = function() {
-    return Math.round(Math.random() * 100);
-  };
+    // @My React Pie Chart
+    // ------------------------------------------------------
+    var randomScalingFactor = function() {
+      return Math.round(Math.random() * 100);
+    };
+    var myData = [];
+    var getData = function() {
+      var client = new ElasticSearch.Client({
+        host: 'localhost:9200',
+        log: 'trace'
+      });
+      client.search({
+        body: {
+          query: {
+            "bool": {
+              "must": [
+                {
+                  "match_all": {}
+                },
+                {
+                  "query_string": {
+                    "query": "exec_1",
+                    "analyze_wildcard": true
+                  }
+                },
+                {
+                  "range": {
+                    "executionTimestamp": {
+                      "gte": 1514757600000,
+                      "lte": 1546293599999,
+                      "format": "epoch_millis"
+                    }
+                  }
+                }
+              ],
+              "must_not": []
+            }
+          },
+          "size": 0,
+          "_source": {
+            "excludes": []
+          },
+          "aggs": {
+            "2": {
+              "terms": {
+                "field": "status",
+                "size": 5,
+                "order": {
+                  "1": "desc"
+                }
+              },
+              "aggs": {
+                "1": {
+                  "cardinality": {
+                    "field": "uid"
+                  }
+                }
+              }
+            }
+          },
+          "version": true,
 
-  let myReactPieContainer = document.getElementById('react_pie_'+this.props.id);
+        }
+      }).then(function (resp) {
+        myData = resp.aggregations["2"]["buckets"];
+        console.log(myData);
+        if (myReactPieContainer) {
+          let pieCtx = myReactPieContainer.getContext('2d');
+          new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+              datasets: [{
+                data: [
+                  myData[0]['doc_count'],
+                  myData[1]['doc_count'],
+                  myData[2]['doc_count'],
+                  myData[3]['doc_count']
+                ],
+                backgroundColor: [
+                  'rgb(0,128,0)',
+                  'rgb(255, 0, 0)',
+                  'rgb(255, 165, 0)',
+                  'rgb(255, 255, 0)',
+                ]
+              }],
+              labels: [
+                myData[0]['key'],
+                myData[1]['key'],
+                myData[2]['key'],
+                myData[3]['key']
+              ]
+            },
+            options: {
+              responsive: true
+            }
+      
+          });
+  
+        } else {
+          console.log('No React pie container');
+        }
+      }, function (err) {
+          console.trace(err.message);
+      });
+      
+      // Axios.get("http://localhost:9200/_search?source={%20%22query%22:%20{%20%22bool%22:%20{%20%22must%22:%20[%20{%20%22match_all%22:%20{}%20},%20{%20%22match_all%22:%20{}%20},%20{%20%22range%22:%20{%20%22executionTimestamp%22:%20{%20%22gte%22:%201514757600000,%20%22lte%22:%201546293599999,%20%22format%22:%20%22epoch_millis%22%20}%20}%20}%20],%20%22must_not%22:%20[]%20}%20},%20%22size%22:%200,%20%22_source%22:%20{%20%22excludes%22:%20[]%20},%20%22aggs%22:%20{%20%222%22:%20{%20%22terms%22:%20{%20%22field%22:%20%22status%22,%20%22size%22:%205,%20%22order%22:%20{%20%221%22:%20%22desc%22%20}%20},%20%22aggs%22:%20{%20%221%22:%20{%20%22cardinality%22:%20{%20%22field%22:%20%22uid%22%20}%20}%20}%20}%20},%20%22version%22:%20true,%20%22highlight%22:%20{%20%22pre_tags%22:%20[%20%22@kibana-highlighted-field@%22%20],%20%22post_tags%22:%20[%20%22@/kibana-highlighted-field@%22%20],%20%22fields%22:%20{%20%22*%22:%20{%20%22highlight_query%22:%20{%20%22bool%22:%20{%20%22must%22:%20[%20{%20%22match_all%22:%20{}%20},%20{%20%22match_all%22:%20{}%20},%20{%20%22range%22:%20{%20%22executionTimestamp%22:%20{%20%22gte%22:%201514757600000,%20%22lte%22:%201546293599999,%20%22format%22:%20%22epoch_millis%22%20}%20}%20}%20],%20%22must_not%22:%20[]%20}%20}%20}%20},%20%22fragment_size%22:%202147483647%20}%20}", {crossDomain:true} )
+      // .then(function (response) {
+      //   console.log(response);
+      // })
+      // .catch(function (error) {
+      //   console.log(error);
+      // });
 
-  if (myReactPieContainer) {
-    let pieCtx = myReactPieContainer.getContext('2d');
+    }
 
-    new Chart(pieCtx, {
-      type: 'pie',
-      data: {
-				datasets: [{
-					data: [
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-					],
-					backgroundColor: [
-						'rgb(255, 99, 132)',
-						'rgb(255, 159, 64)',
-						'rgb(255, 205, 86)',
-						'rgb(75, 192, 192)',
-            'rgb(54, 162, 235)',
-					],
-					label: 'Dataset 1'
-				}],
-				labels: [
-					'Red',
-					'Orange',
-					'Yellow',
-					'Green',
-					'Blue'
-				]
-			},
-			options: {
-				responsive: true
-			}
+    let myReactPieContainer = document.getElementById('react_pie_'+this.props.id);
+    if (this.props.id === '1') {
+      getData();
+    } else {
+      if (myReactPieContainer) {
+        let pieCtx = myReactPieContainer.getContext('2d');
+    
+        new Chart(pieCtx, {
+          type: 'pie',
+          data: {
+            datasets: [{
+              data: [
+                randomScalingFactor(),
+                randomScalingFactor(),
+                randomScalingFactor(),
+                randomScalingFactor(),
+                randomScalingFactor(),
+              ],
+              backgroundColor: [
+                'rgb(255, 99, 132)',
+                'rgb(255, 159, 64)',
+                'rgb(255, 205, 86)',
+                'rgb(75, 192, 192)',
+                'rgb(54, 162, 235)',
+              ],
+              label: 'Dataset 1'
+            }],
+            labels: [
+              'Red',
+              'Orange',
+              'Yellow',
+              'Green',
+              'Blue'
+            ]
+          },
+          options: {
+            responsive: true
+          }
+    
+        });
 
-    });
-
-
-  } else {
-    console.log('No React pie container');
+      } else {
+        console.log('No React pie container');
+      }
+    
+    }
   }
-  }
+  
   
   render() {
     return (
@@ -219,25 +335,96 @@ class ReactPie extends React.Component {
 }
 
 class MyFirstGrid extends React.Component {
-  render() {
-    // layout is an array of objects, see the demo for more complete usage
-    var layout = [
-      {i: 'a', x: 0, y: 0, w: 1, h: 2, },
-      {i: 'b', x: 1, y: 0, w: 3, h: 2, minW: 2, maxW: 4},
-      {i: 'c', x: 4, y: 0, w: 1, h: 2},
-    ];
+  constructor(props) {
+    //TODO: create state with some items/widgets.
+    //TODO: create a function that generate a widget and append it to button.
+    //this.state.items = {LIST OF ITEMS}
+    super(props);
+
+    this.state = {
+      items: [0, 1, 2].map(function(i, key, list) {
+        return {
+          i: i.toString(),
+          x: i * 2,
+          y: 0,
+          w: 3,
+          h: 5,
+        };
+      }),
+      newCounter: 0
+    };
+    this.onAddItem = this.onAddItem.bind(this);
+  }
+
+  onAddItem() {
+    this.setState({
+      // Add a new item. It must have a unique key!
+      items: this.state.items.concat({
+        i: "n" + this.state.newCounter,
+        x: (this.state.items.length * 3) % (this.state.cols || 12),
+        y: Infinity, // puts it at the bottom
+        w: 3,
+        h: 5
+      }),
+      // Increment the counter to ensure key is always unique.
+      newCounter: this.state.newCounter + 1
+    });
+  }
+  onRemoveItem(i) {
+    console.log("removing", i);
+    this.setState({ items: _.reject(this.state.items, { i: i }) });
+  }
+  createElement(el) {
+    const removeStyle = {
+      position: "absolute",
+      right: "2px",
+      top: 0,
+      cursor: "pointer"
+    };
+    const i = el.i;
     return (
-      <ReactGridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
-        <div key="a">
+      <div key={i} data-grid={el}>
+        <ReactPie id={i}/>
+        <span
+          className="remove"
+          style={removeStyle}
+          onClick={this.onRemoveItem.bind(this, i)}
+        >
+          x
+        </span>
+      </div>
+    );
+  }
+  render() {
+    //var height = 10;
+    // layout is an array of objects, see the demo for more complete usage
+    // var layout = [
+    //   {i: 'a', x: 0, y: 0, w: height-3, h: height, minH: 10, minW: 5},
+    //   {i: 'b', x: 1, y: 0, w: 3, h: 5, minW: 2, maxW: 4},
+    //   {i: 'c', x: 4, y: 0, w: 5, h: 5, minH: 5, minW: 5},
+    // ];
+    return (
+      <div>
+        <div> 
+          <button onClick={this.onAddItem}>Add Random Chart</button>
+          <button onClick={this.getData}>Add exec_1 Chart</button>
+        </div>
+      
+
+      <ReactGridLayout className="layout" rowHeight={30} width={1200}>
+        {/*layout={layout}
+          /* <div key="a">
           <ReactPie id="1"/>
-          </div>
+        </div>
         <div key="b">
           <ReactPie id="2"/>
-          </div>
+        </div>
         <div key="c">
           <ReactPie id="3"/>
-          </div>
+        </div> */}
+        {_.map(this.state.items, el => this.createElement(el))}
       </ReactGridLayout>
+      </div>
     )
   }
 } ;
