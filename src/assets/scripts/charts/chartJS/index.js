@@ -156,8 +156,12 @@ export default (function () {
 }()
 )
 
+/*
+  The concrute React component to show the data.
+*/
 class ReactPie extends React.Component {
 
+  //The ChartJS operation is after mounting so the context will exist.
   componentDidMount() {
 
   // ------------------------------------------------------
@@ -324,7 +328,6 @@ class ReactPie extends React.Component {
     }
   }
   
-  
   render() {
     return (
       <div>
@@ -364,16 +367,18 @@ class MyFirstGrid extends React.Component {
         x: (this.state.items.length * 3) % (this.state.cols || 12),
         y: Infinity, // puts it at the bottom
         w: 3,
-        h: 5
+        h: 5 
       }),
       // Increment the counter to ensure key is always unique.
       newCounter: this.state.newCounter + 1
     });
   }
+  
   onRemoveItem(i) {
     console.log("removing", i);
     this.setState({ items: _.reject(this.state.items, { i: i }) });
   }
+
   createElement(el) {
     const removeStyle = {
       position: "absolute",
@@ -396,7 +401,6 @@ class MyFirstGrid extends React.Component {
     );
   }
   render() {
-    //var height = 10;
     // layout is an array of objects, see the demo for more complete usage
     // var layout = [
     //   {i: 'a', x: 0, y: 0, w: height-3, h: height, minH: 10, minW: 5},
@@ -406,34 +410,110 @@ class MyFirstGrid extends React.Component {
     return (
       <div>
         <div> 
-          <button onClick={this.onAddItem}>Add Random Chart</button>
-          <button onClick={this.getData}>Add exec_1 Chart</button>
+          <button onClick={this.onAddItem}>Add Random Pie Chart</button>
+          <button onClick={this.getData}>Add exec_1 Pie Chart</button>
         </div>
-      
-
-      <ReactGridLayout className="layout" rowHeight={30} width={1200}>
-        {/*layout={layout}
-          /* <div key="a">
-          <ReactPie id="1"/>
-        </div>
-        <div key="b">
-          <ReactPie id="2"/>
-        </div>
-        <div key="c">
-          <ReactPie id="3"/>
-        </div> */}
-        {_.map(this.state.items, el => this.createElement(el))}
-      </ReactGridLayout>
+        <ReactGridLayout className="layout" rowHeight={30} width={1200}>
+          {//maping the list of items to html items
+          }
+          {_.map(this.state.items, el => this.createElement(el))}
+        </ReactGridLayout>
       </div>
     )
   }
 } ;
+
+class SecondGird extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      items: [
+        {
+          i: "5",
+          x: 0,
+          y: Infinity, // puts it at the bottom
+          w: 3,
+          h: 5,
+          tagName: ReactPie
+        }
+      ],
+      itemsIdCounter: 5
+    }
+
+    this.addItem = this.addItem.bind(this);
+  }
+
+  addItem(myTagName) {
+    this.setState({
+      // Add a new item. It must have a unique key!
+      items: this.state.items.concat({
+        i: "item_" + this.state.itemsIdCounter,
+        x: (this.state.items.length * 3) % (this.state.cols || 12),
+        y: Infinity, // puts it at the bottom
+        w: 3,
+        h: 5,
+        tagName: myTagName
+      }),
+      // Increment the counter to ensure key is always unique.
+      itemsIdCounter: this.state.itemsIdCounter + 1
+    });
+  }
+
+  onRemoveItem(i) {
+    console.log("removing", i);
+    this.setState({ items: _.reject(this.state.items, { i: i }) });
+  }
+
+  createElement(el) {
+    const removeStyle = {
+      position: "absolute",
+      right: "2px",
+      top: 0,
+      cursor: "pointer"
+    };
+
+    const i = el.i;
+  
+    const MyTag = el.tagName;
+
+    return (
+      <div key={i} data-grid={el}>
+        <MyTag id={i} />
+        <span
+          className="remove"
+          style={removeStyle}
+          onClick={this.onRemoveItem.bind(this, i)}
+        >
+          x
+        </span>
+      </div>
+    );
+  }
+
+  render() {
+    return (
+      <div>
+        <button onClick={() => {this.addItem(ReactPie)}}>Add Random Pie Chart</button>
+        <form>
+          
+        </form>
+        <ReactGridLayout className="layout" rowHeight={30} width={1200}>
+          {_.map(this.state.items, el => this.createElement(el))}
+        </ReactGridLayout>
+      </div>
+    );
+
+
+  }
+}
 
 export class App extends React.Component{
   render() {
     return (
     <div>
       <MyFirstGrid />
+      <SecondGird />
     </div>);
   }
 }
